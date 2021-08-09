@@ -14,7 +14,7 @@ int main(int argc,char *argv[]){
 	 handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
 
 	 struct bpf_program fp;		/* The compiled filter expression */
-	 char filter_exp[] = "port 23";	/* The filter expression */
+	 char filter_exp[] = "port 80";	/* The filter expression */
 	 bpf_u_int32 mask;		/* The netmask of our sniffing device */
 	 bpf_u_int32 net;		/* The IP of our sniffing device */
 	 
@@ -46,9 +46,18 @@ int main(int argc,char *argv[]){
   	 addr.s_addr = mask;
   	 maskp = inet_ntoa(addr);
   	 printf("Netmask of inet_addr : %s\n",maskp);
-	
-	 /*print device and packet */
+  	 
+  	 /*print device and packet */
 	 printf("Device name : %s\n",dev);
-	 printf("Packet captured : %d\n",handle);
+  	 
+  	 /*Grab packets */
+  	 struct pcap_pkthdr header;	/* The header that pcap gives us */
+	 const u_char *packet;		/* The actual packet */
+	 packet = pcap_next(handle, &header);
+         /* Print its length */
+	 printf("sniffed a packet with length of [%d]\n", header.len);
+	 /* And close the session */
+	 pcap_close(handle);
+	 
 	 return 0;
 }
